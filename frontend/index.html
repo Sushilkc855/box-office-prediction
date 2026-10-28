@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Box Office Estimator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+  <main class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+    <header class="mb-6 text-center">
+      <h1 class="text-2xl font-black tracking-tight text-white">Box Office Estimator</h1>
+      <p class="text-xs text-slate-400 mt-1">Weekend estimate = Thursday preview gross × 8</p>
+    </header>
+
+    <form id="weekendBoxOfficeForm">
+      <div class="space-y-2 mb-4">
+        <label for="movieTitleInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Movie Title</label>
+        <input id="movieTitleInput" name="movie_title" type="text" required maxlength="200"
+          placeholder="e.g. Dune: Part Two"
+          class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+      </div>
+
+      <div class="space-y-2 mb-6">
+        <label for="previewGrossInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Thursday Preview Gross (USD)</label>
+        <input id="previewGrossInput" name="preview_gross" type="number" required min="0.01" step="0.01"
+          placeholder="12000000"
+          class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+      </div>
+
+      <button id="calculateWeekendBoxOfficeButton" type="submit"
+        class="w-full bg-emerald-600 hover:bg-emerald-500 transition py-3 rounded-lg text-sm font-bold text-white tracking-wide shadow-lg shadow-emerald-950/50">
+        Calculate Weekend Box Office
+      </button>
+      <p id="estimateErrorMessage" role="alert" hidden class="mt-4 text-sm text-red-400"></p>
+    </form>
+
+    <section id="weekendBoxOfficeResult" aria-live="polite" hidden class="mt-6 p-5 bg-emerald-950/30 border border-emerald-800/40 rounded-xl text-center">
+      <h2 id="resultMovieTitle" class="text-sm font-semibold text-slate-100 mb-2"></h2>
+      <p class="text-[11px] font-bold uppercase tracking-widest text-emerald-400">Estimated Weekend Box Office (8×)</p>
+      <p id="estimatedWeekendBoxOffice" class="text-3xl font-black text-emerald-300 mt-1"></p>
+    </section>
+  </main>
+  <script src="/js/app.js"></script>
+</body>
+</html>
