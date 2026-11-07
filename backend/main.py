@@ -1,14 +1,15 @@
-import math
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
 WEEKEND_MULTIPLIER = 8
+MAX_PREVIEW_GROSS = 1_000_000_000
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 app = FastAPI(title="Box Office Estimator API")
+
 
 class WeekendBoxOfficeRequest(BaseModel):
     movie_title: str = Field(min_length=1, max_length=200)
@@ -16,8 +17,15 @@ class WeekendBoxOfficeRequest(BaseModel):
 
     @field_validator("movie_title", mode="before")
     @classmethod
-    def trim_movie_title(cls, value):
+    def trim_movie_title(cls, value: object) -> object:
         return value.strip() if isinstance(value, str) else value
+
+    @field_validator("preview_gross")
+    @classmethod
+    def validate_preview_gross(cls, value: float) -> float:
+        if value > MAX_PREVIEW_GROSS:
+            raise ValueError("The estimate is too large. Enter a smaller preview amount.")
+        return value
 
 
 class WeekendBoxOfficeResponse(BaseModel):
@@ -30,18 +38,13 @@ class WeekendBoxOfficeResponse(BaseModel):
 async def estimate_weekend_box_office(
     request: WeekendBoxOfficeRequest,
 ) -> WeekendBoxOfficeResponse:
-    estimated_gross = request.preview_gross * WEEKEND_MULTIPLIER
-    if not math.isfinite(estimated_gross):
-        raise HTTPException(
-            status_code=422,
-            detail="The estimate is too large. Enter a smaller preview amount.",
-        )
-
+    estimated_gross = round(request.preview_gross * WEEKEND_MULTIPLIER)
     return WeekendBoxOfficeResponse(
         movie_title=request.movie_title,
         preview_gross=request.preview_gross,
-        estimated_weekend_box_office=round(estimated_gross),
+        estimated_weekend_box_office=estimated_gross,
     )
 
 
+FRONTEND_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

@@ -41,9 +41,14 @@ async function handleWeekendBoxOfficeSubmit(event) {
     });
     const estimateResponseBody = await estimateResponse.json();
     if (!estimateResponse.ok) {
-      const apiErrorMessage = typeof estimateResponseBody.detail === "string"
-        ? estimateResponseBody.detail
-        : "Check the movie title and preview amount and try again.";
+      const { detail } = estimateResponseBody;
+      const validationMessage = Array.isArray(detail) ? detail[0]?.msg : undefined;
+      let apiErrorMessage = "Check the movie title and preview amount and try again.";
+      if (typeof detail === "string") {
+        apiErrorMessage = detail;
+      } else if (typeof validationMessage === "string") {
+        apiErrorMessage = validationMessage.replace(/^Value error, /, "");
+      }
       throw new Error(apiErrorMessage);
     }
 
